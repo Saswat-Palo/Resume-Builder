@@ -1,0 +1,263 @@
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
+  color: #f8fafc;
+  padding: 20px;
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  color: #c7d2fe;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.container {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.form {
+  background: rgba(30, 41, 59, 0.7); 
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 16px;
+  width: 40%;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #a5b4fc;
+  display: block;
+  margin-top: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+
+input, textarea {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  background: #0f172a;
+  color: #fff;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #64748b;
+}
+
+input:focus, textarea:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 15px rgba(129, 140, 248, 0.4); 
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px); 
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+}
+
+.btn-secondary {
+  background: #334155;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #475569;
+  transform: translateY(-3px);
+}
+
+button:active {
+  transform: scale(0.95); 
+}
+
+
+.preview {
+  background: #ffffff; 
+  color: #000000;
+  padding: 40px;
+  border-radius: 8px;
+  width: 60%;
+  min-height: 600px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+#resumeContent {
+  font-family: 'Arial', sans-serif; 
+}
+
+#resumeContent h2 {
+  color: #0f172a;
+  margin-bottom: 5px;
+  font-size: 32px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#resumeContent hr {
+  border: none;
+  border-top: 3px solid #4f46e5;
+  margin-bottom: 20px;
+}
+
+#resumeContent h3 {
+  color: #333;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 5px;
+  margin-top: 25px;
+  text-transform: uppercase;
+  font-size: 18px;
+}
+
+#resumeContent ul {
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+#resumeContent li {
+  margin-bottom: 5px;
+}
+
+#resumeContent, 
+#resumeContent p, 
+#resumeContent ul, 
+#resumeContent li {
+  color: #000000 !important;
+}
+
+#intro-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0f172a; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; 
+  animation: fadeOutIntro 0.5s ease 2.5s forwards; 
+}
+
+.intro-content {
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  color: #f8fafc;
+}
+
+.intro-text-top {
+  font-size: 60px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #c7d2fe;
+  opacity: 0;
+  animation: dropIn 0.6s ease forwards;
+}
+
+.intro-builder-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+  opacity: 0;
+  animation: popIn 0.5s ease 0.6s forwards; 
+}
+
+.intro-text-bottom {
+  font-size: 50px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  
+  
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  
+  background-clip: text;
+  color: transparent;
+}
+
+.dumbbell {
+  font-size: 55px;
+  display: inline-block;
+}
+
+.dumbbell.right {
+  animation: pumpRight 0.4s alternate infinite 0.6s;
+}
+
+.dumbbell.left {
+  transform: scaleX(-1);
+  animation: pumpLeft 0.4s alternate infinite 0.6s;
+}
+
+@keyframes dropIn {
+  0% { transform: translateY(-50px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pumpRight {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-25deg); } 
+}
+
+@keyframes pumpLeft {
+  0% { transform: scaleX(-1) rotate(0deg); }
+  100% { transform: scaleX(-1) rotate(-25deg); } 
+}
+
+@keyframes fadeOutIntro {
+  0% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
