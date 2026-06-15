@@ -1,35 +1,66 @@
 const supabaseClient = window.supabase.createClient(
-  "https://oduavcbqowmdisuaaltr.supabase.co",
-  "sb_publishable_bLjLEGcoiSBLLnPqzmjU7A_ElpgfOx_"
+  "https://feqncmpoofgxyldxobzu.supabase.co",
+  "sb_publishable_kL81VA7D6E08K4ObwB4Xrg_9Y_RAEcG"
 );
 
+// --- 1. INITIALIZATION & STATE ---
+window.onload = () => {
+  generateResume(); // Build initial view
+  
+  // Fade out intro animation
+  setTimeout(() => {
+    const introScreen = document.getElementById("intro-screen");
+    if (introScreen) introScreen.style.display = "none";
+  }, 3000);
+};
+
+// Check login status globally
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  const loginScreen = document.getElementById('login-screen');
+  const appContainer = document.getElementById('app-container');
+
+  if (session) {
+    loginScreen.style.display = 'none';
+    appContainer.style.display = 'flex';
+    generateResume(); 
+  } else {
+    loginScreen.style.display = 'flex';
+    appContainer.style.display = 'none';
+  }
+});
+
+// --- 2. AUTHENTICATION ---
+async function signInWithGoogle() {
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  });
+  if (error) alert("Error with Google Sign-In: " + error.message);
+}
+
+async function signOut() {
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) alert("Error logging out: " + error.message);
+}
+
+// --- 3. LIVE DOM UPDATES ---
 function generateResume() {
-  let name = document.getElementById("name").value;
-  let skills = document.getElementById("skills").value;
-  let education = document.getElementById("education").value; // New!
-  let projects = document.getElementById("projects").value;
+  const name = document.getElementById("name").value;
+  const template = document.getElementById("template").value;
+  const skills = document.getElementById("skills").value;
+  const education = document.getElementById("education").value; 
+  const projects = document.getElementById("projects").value;
 
-  let preview = document.getElementById("preview");
+  const preview = document.getElementById("preview");
 
-  let skillList = skills.split(",").filter(s => s.trim() !== "");
-  let formattedSkills = skillList
-    .map(skill => `<li>${skill.trim()}</li>`)
-    .join("");
+  // Format text arrays
+  const formattedSkills = skills.split(",").filter(s => s.trim() !== "").map(skill => `<li>${skill.trim()}</li>`).join("");
+  const formattedEducation = education.split("\n").filter(e => e.trim() !== "").map(edu => `<li>${edu.trim()}</li>`).join("");
+  const formattedProjects = projects.split("\n").filter(p => p.trim() !== "").map(project => `<li>${project.trim()}</li>`).join("");
 
-
-  let eduList = education.split("\n").filter(e => e.trim() !== "");
-  let formattedEducation = eduList
-    .map(edu => `<li>${edu.trim()}</li>`)
-    .join("");
-
-
-  let projectList = projects.split("\n").filter(p => p.trim() !== "");
-  let formattedProjects = projectList
-    .map(project => `<li>${project.trim()}</li>`)
-    .join("");
-
+  // Inject with selected template class applied
   preview.innerHTML = `
-    <div id="resumeContent">
+    <div id="resumeContent" class="${template}">
       <h2>${name || "Your Name"}</h2>
       <hr>
 
@@ -45,43 +76,59 @@ function generateResume() {
   `;
 }
 
-function downloadPDF() {
-  let element = document.getElementById("resumeContent");
+// --- 4. THE DATA PIPELINE (SAVE THEN DOWNLOAD) ---
+async function saveAndDownload() {
+  const downloadBtn = document.getElementById("downloadBtn");
+  const originalText = downloadBtn.innerHTML;
 
-  let options = {
+  // 1. Check Auth Status First
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    alert("Session expired. Please sign in to download.");
+    return;
+  }
+
+  // 2. Lock Button State UI
+  downloadBtn.innerHTML = "⏳ Saving & Generating...";
+  downloadBtn.disabled = true;
+
+  // 3. Gather Form Data
+  const resumeData = {
+    email: user.email,
+    name: document.getElementById("name").value,
+    skills: document.getElementById("skills").value,
+    education: document.getElementById("education").value,
+    projects: document.getElementById("projects").value
+  };
+
+  // 4. Force Save to Database
+  const { error } = await supabaseClient
+    .from("resumes")
+    .insert([resumeData]);
+
+  // 5. Conditional PDF Generation
+  if (error) {
+    console.error(error);
+    alert("Error securing your data in the database. Download blocked.");
+  } else {
+    // Save successful -> Allow user to have the PDF
+    triggerPDF();
+  }
+
+  // 6. Reset UI
+  downloadBtn.innerHTML = originalText;
+  downloadBtn.disabled = false;
+}
+
+// The core html2pdf logic
+function triggerPDF() {
+  const element = document.getElementById("resumeContent");
+  const options = {
     margin:       15,
     filename:     'My_Resume.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  { scale: 2 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
-
   html2pdf().set(options).from(element).save();
 }
-
-async function saveResume() {
-  let name = document.getElementById("name").value;
-  let skills = document.getElementById("skills").value;
-  let education = document.getElementById("education").value; 
-  let projects = document.getElementById("projects").value;
-
-  const { error } = await supabaseClient
-    .from("resumes")
-    .insert([{ name, skills, education, projects }]);
-
-  if (error) {
-    alert("Error saving");
-    console.log(error);
-  } else {
-    alert("Saved successfully!");
-  }
-}
-
-window.onload = generateResume;
-
-setTimeout(() => {
-  const introScreen = document.getElementById("intro-screen");
-  if (introScreen) {
-    introScreen.style.display = "none";
-  }
-}, 3000); 

@@ -1,53 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <div id="intro-screen">
-  <div class="intro-content">
-    <div class="intro-text-top">Resume</div>
-    <div class="intro-builder-container">
-      <span class="dumbbell left">💪</span>
-      <div class="intro-text-bottom">Astra</div>
-      <span class="dumbbell right">💪</span>
-    </div>
-  </div>
-</div>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume Astra</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
-<h1>Resume Astra</h1>
-
-<div class="container">
-  <div class="form">
-    <label>Full Name</label>
-    <input type="text" id="name" placeholder="e.g. YOUR NAME" oninput="generateResume()">
-    
-    <label>Education (Press Enter for a new entry)</label>
-    <textarea id="education" placeholder="UG Degree - University Name (From-To YEAR)&#10;High School Diploma - School Name (2020)" oninput="generateResume()"></textarea>
-
-    <label>Skills (Comma separated)</label>
-    <textarea id="skills" placeholder="HTML, CSS, JavaScript, Python" oninput="generateResume()"></textarea>
-    
-    <label>Projects (Press Enter for a new project)</label>
-    <textarea id="projects" placeholder="Portfolio Website&#10;E-commerce App" oninput="generateResume()"></textarea>
-
-    <div class="button-group">
-      <button class="btn-primary" onclick="downloadPDF()">⬇ Download PDF</button>
-      <button class="btn-secondary" onclick="saveResume()">💾 Save Resume</button>
+  <div id="intro-screen">
+    <div class="intro-content">
+      <div class="intro-text-top">Resume</div>
+      <div class="intro-builder-container">
+        <span class="dumbbell left">💪</span>
+        <div class="intro-text-bottom">Astra</div>
+        <span class="dumbbell right">💪</span>
+      </div>
     </div>
   </div>
 
-  <div class="preview" id="preview"></div>
-</div>
+  <header class="app-header">
+    <h1>Resume <span>Astra</span></h1>
+  </header>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <div id="login-screen" class="login-container">
+    <div class="glass-card text-center">
+      <h2>Welcome to Astra</h2>
+      <p>Sign in to build, save, and download your professional resume.</p>
+      <button class="btn-primary auth-btn" onclick="signInWithGoogle()">🌐 Sign in with Google</button>
+    </div>
+  </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <div class="container" id="app-container" style="display: none;">
+    
+    <div class="form-panel glass-card">
+      <div class="input-group">
+        <label>Select Template</label>
+        <select id="template" onchange="generateResume()">
+          <option value="template-classic">Classic (Professional)</option>
+          <option value="template-modern">Modern (Blue Header)</option>
+          <option value="template-minimalist">Minimalist (Clean)</option>
+        </select>
+      </div>
 
-<script src="script.js"></script>
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Jane Doe" oninput="generateResume()">
+      </div>
+      
+      <div class="input-group">
+        <label>Education (Press Enter for a new entry)</label>
+        <textarea id="education" placeholder="&#10;" oninput="generateResume()"></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Skills (Comma separated)</label>
+        <textarea id="skills" placeholder="" oninput="generateResume()"></textarea>
+      </div>
+      
+      <div class="input-group">
+        <label>Projects (Press Enter for a new project)</label>
+        <textarea id="projects" placeholder="&#10;" oninput="generateResume()"></textarea>
+      </div>
+
+      <div class="action-buttons">
+        <button id="downloadBtn" class="btn-primary full-width" onclick="saveAndDownload()">⬇ Save & Download PDF</button>
+        <button class="btn-danger outline full-width" onclick="signOut()">🚪 Sign Out</button>
+      </div>
+    </div>
+
+    <div class="preview-panel">
+      <div class="paper-preview" id="preview">
+        </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
