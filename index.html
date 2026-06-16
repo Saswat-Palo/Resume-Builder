@@ -6,9 +6,12 @@
   <title>Resume Astra</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 </head>
 
 <body>
+
+  <!-- INTRO ANIMATION -->
   <div id="intro-screen">
     <div class="intro-content">
       <div class="intro-text-top">Resume</div>
@@ -20,65 +23,176 @@
     </div>
   </div>
 
+  <!-- APP HEADER -->
   <header class="app-header">
     <h1>Resume <span>Astra</span></h1>
+    <p class="app-tagline">Build a job-winning resume in minutes</p>
   </header>
 
+  <!-- LOGIN SCREEN -->
   <div id="login-screen" class="login-container">
     <div class="glass-card text-center">
-      <h2>Welcome to Astra</h2>
-      <p>Sign in to build, save, and download your professional resume.</p>
-      <button class="btn-primary auth-btn" onclick="signInWithGoogle()">🌐 Sign in with Google</button>
+      <div class="login-icon">📄</div>
+      <h2>Welcome to Resume Astra</h2>
+      <p>Sign in to build, save, and download your professional resume with AI-powered suggestions.</p>
+      <button class="btn-primary auth-btn" onclick="signInWithGoogle()">
+        <i class="ti ti-brand-google"></i> Sign in with Google
+      </button>
     </div>
   </div>
 
+  <!-- MAIN APP -->
   <div class="container" id="app-container" style="display: none;">
-    
+
+    <!-- LEFT: FORM SIDEBAR -->
     <div class="form-panel glass-card">
-      <div class="input-group">
-        <label>Select Template</label>
-        <select id="template" onchange="generateResume()">
-          <option value="template-classic">Classic (Professional)</option>
-          <option value="template-modern">Modern (Blue Header)</option>
-          <option value="template-minimalist">Minimalist (Clean)</option>
-        </select>
+
+      <!-- Progress -->
+      <div class="progress-header">
+        <span class="progress-label" id="progressLabel">0% complete</span>
+        <span class="progress-hint" id="progressHint">Fill in your details</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('basics', this)"><i class="ti ti-user"></i> Basics</button>
+        <button class="tab" onclick="switchTab('experience', this)"><i class="ti ti-briefcase"></i> Work</button>
+        <button class="tab" onclick="switchTab('education', this)"><i class="ti ti-school"></i> Edu</button>
+        <button class="tab" onclick="switchTab('extras', this)"><i class="ti ti-sparkles"></i> More</button>
       </div>
 
-      <div class="input-group">
-        <label>Full Name</label>
-        <input type="text" id="name" placeholder="e.g. Jane Doe" oninput="generateResume()">
-      </div>
-      
-      <div class="input-group">
-        <label>Education (Press Enter for a new entry)</label>
-        <textarea id="education" placeholder="&#10;" oninput="generateResume()"></textarea>
-      </div>
+      <!-- TAB: BASICS -->
+      <div class="tab-panel active" id="tab-basics">
+        <div class="section-label"><i class="ti ti-id-badge"></i> Personal Info</div>
 
-      <div class="input-group">
-        <label>Skills (Comma separated)</label>
-        <textarea id="skills" placeholder="" oninput="generateResume()"></textarea>
-      </div>
-      
-      <div class="input-group">
-        <label>Projects (Press Enter for a new project)</label>
-        <textarea id="projects" placeholder="&#10;" oninput="generateResume()"></textarea>
-      </div>
-
-      <div class="action-buttons">
-        <button id="downloadBtn" class="btn-primary full-width" onclick="saveAndDownload()">⬇ Save & Download PDF</button>
-        <button class="btn-danger outline full-width" onclick="signOut()">🚪 Sign Out</button>
-      </div>
-    </div>
-
-    <div class="preview-panel">
-      <div class="paper-preview" id="preview">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="f-name" placeholder="e.g. Jane Doe" oninput="generateResume()">
         </div>
+
+        <div class="input-group">
+          <label>Job Title / Target Role</label>
+          <input type="text" id="f-title" placeholder="e.g. Senior Product Designer" oninput="generateResume()">
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="f-email" placeholder="jane@email.com" oninput="generateResume()">
+          </div>
+          <div class="input-group">
+            <label>Phone</label>
+            <input type="tel" id="f-phone" placeholder="+1 555 000 0000" oninput="generateResume()">
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label>Location</label>
+            <input type="text" id="f-location" placeholder="New York, NY" oninput="generateResume()">
+          </div>
+          <div class="input-group">
+            <label>LinkedIn</label>
+            <input type="text" id="f-linkedin" placeholder="linkedin.com/in/jane" oninput="generateResume()">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Portfolio / Website</label>
+          <input type="text" id="f-website" placeholder="janedesigns.com" oninput="generateResume()">
+        </div>
+
+        <div class="section-label" style="margin-top: 8px;"><i class="ti ti-file-text"></i> Professional Summary</div>
+        <button class="ai-btn" id="aiSummaryBtn" onclick="aiImprove()">
+          <i class="ti ti-sparkles"></i> Write Summary with AI
+        </button>
+        <div class="ai-result" id="aiSummaryResult"></div>
+        <div class="input-group">
+          <textarea id="f-summary" placeholder="A brief 2–3 sentence professional summary about your background, strengths, and goals..." oninput="generateResume()"></textarea>
+        </div>
+
+        <div class="section-label" style="margin-top: 8px;"><i class="ti ti-layout"></i> Template</div>
+        <div class="input-group">
+          <select id="f-template" onchange="generateResume()">
+            <option value="template-classic">Classic — Professional</option>
+            <option value="template-modern">Modern — Blue Accent</option>
+            <option value="template-minimalist">Minimalist — Clean</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TAB: EXPERIENCE -->
+      <div class="tab-panel" id="tab-experience">
+        <div class="section-label"><i class="ti ti-briefcase"></i> Work Experience</div>
+        <div id="exp-list"></div>
+        <button class="add-btn" onclick="addExp()"><i class="ti ti-plus"></i> Add Experience</button>
+      </div>
+
+      <!-- TAB: EDUCATION -->
+      <div class="tab-panel" id="tab-education">
+        <div class="section-label"><i class="ti ti-school"></i> Education</div>
+        <div id="edu-list"></div>
+        <button class="add-btn" onclick="addEdu()"><i class="ti ti-plus"></i> Add Education</button>
+
+        <div class="section-label" style="margin-top: 18px;"><i class="ti ti-award"></i> Certifications</div>
+        <div class="input-group">
+          <textarea id="f-certs" placeholder="AWS Certified Developer, 2024&#10;Google Analytics Certified, 2023" oninput="generateResume()"></textarea>
+        </div>
+      </div>
+
+      <!-- TAB: EXTRAS -->
+      <div class="tab-panel" id="tab-extras">
+        <div class="section-label"><i class="ti ti-code"></i> Skills</div>
+        <div class="input-group">
+          <textarea id="f-skills" placeholder="React, TypeScript, Figma, Python, SQL, Node.js" oninput="generateResume()" style="min-height: 70px;"></textarea>
+        </div>
+
+        <div class="section-label" style="margin-top: 4px;"><i class="ti ti-rocket"></i> Projects</div>
+        <div id="proj-list"></div>
+        <button class="add-btn" onclick="addProj()"><i class="ti ti-plus"></i> Add Project</button>
+
+        <div class="section-label" style="margin-top: 18px;"><i class="ti ti-language"></i> Languages</div>
+        <div class="input-group">
+          <textarea id="f-langs" placeholder="English (Native), Spanish (B2), French (A2)" oninput="generateResume()" style="min-height: 70px;"></textarea>
+        </div>
+
+        <div class="section-label" style="margin-top: 4px;"><i class="ti ti-heart"></i> Interests / Hobbies</div>
+        <div class="input-group">
+          <textarea id="f-hobbies" placeholder="Rock climbing, open-source contribution, photography" oninput="generateResume()" style="min-height: 70px;"></textarea>
+        </div>
+      </div>
+
+      <!-- BOTTOM ACTIONS -->
+      <div class="action-buttons">
+        <div class="checklist-row" id="scoreChips"></div>
+        <button id="downloadBtn" class="btn-primary full-width" onclick="saveAndDownload()">
+          <i class="ti ti-download"></i> Save & Download PDF
+        </button>
+        <button class="btn-danger outline full-width" onclick="signOut()">
+          <i class="ti ti-logout"></i> Sign Out
+        </button>
+      </div>
     </div>
+
+    <!-- RIGHT: LIVE PREVIEW -->
+    <div class="preview-panel">
+      <div class="preview-toolbar">
+        <span class="preview-label"><i class="ti ti-eye"></i> Live Preview</span>
+        <span class="preview-hint">Updates as you type</span>
+      </div>
+      <div class="paper-preview" id="preview">
+        <div class="preview-empty">
+          <i class="ti ti-file-text" style="font-size: 48px; color: #cbd5e1;"></i>
+          <p>Start filling in your details<br>to see your resume appear here</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <script src="script.js"></script>
-
 </body>
 </html>
