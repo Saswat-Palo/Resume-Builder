@@ -266,7 +266,7 @@ function updateProgress() {
 }
 
 // ============================================================
-// 8. LIVE RESUME GENERATION
+// 8. LIVE RESUME GENERATION                                   
 // ============================================================
 function generateResume() {
   updateProgress();
