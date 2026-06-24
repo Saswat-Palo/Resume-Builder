@@ -63,6 +63,156 @@ function switchTab(name, clickedBtn) {
 }
 
 // ============================================================
+// DATE PICKER (MONTH/YEAR & YEAR) — NO MANUAL TYPING
+// ============================================================
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let openPickerId = null;
+let pickerNavState = {}; // pickerId -> year (month-year picker) or decade start (year picker)
+
+function parseMonthYear(value) {
+  if (!value || value === "Present") return null;
+  const parts = value.trim().split(" ");
+  if (parts.length === 2 && MONTH_NAMES.includes(parts[0]) && /^\d{4}$/.test(parts[1])) {
+    return { month: parts[0], year: parseInt(parts[1], 10) };
+  }
+  return null;
+}
+
+// Resolves a pickerId like "exp-start-12345" or "edu-year-12345" back to its entry
+function getPickerContext(pickerId) {
+  const parts = pickerId.split("-");
+  const type = parts[0];
+  const field = parts[1];
+  const id = Number(parts.slice(2).join("-"));
+  const arr = type === "exp" ? expEntries : eduEntries;
+  const entry = arr.find((x) => x.id === id);
+  return { type, field, entry };
+}
+
+function toggleDatePicker(pickerId, ev) {
+  if (ev) ev.stopPropagation();
+  const popup = document.getElementById("popup-" + pickerId);
+  if (!popup) return;
+  const wasOpen = popup.classList.contains("open");
+  closeAllDatePickers();
+  if (!wasOpen) {
+    popup.classList.add("open");
+    openPickerId = pickerId;
+  }
+}
+
+function closeAllDatePickers() {
+  document.querySelectorAll(".date-picker-popup.open").forEach((p) => p.classList.remove("open"));
+  openPickerId = null;
+}
+
+// Close any open picker when clicking outside of it
+document.addEventListener("click", (e) => {
+  if (openPickerId && !e.target.closest(".date-input-wrapper")) {
+    closeAllDatePickers();
+  }
+});
+
+function refreshPickerPopup(pickerId) {
+  const popup = document.getElementById("popup-" + pickerId);
+  if (!popup) return;
+  const { type, field, entry } = getPickerContext(pickerId);
+  const currentValue = entry ? entry[field] : "";
+  const html = type === "edu" ? renderYearPicker(pickerId, currentValue) : renderMonthYearPicker(pickerId, currentValue);
+  popup.outerHTML = html;
+  const newPopup = document.getElementById("popup-" + pickerId);
+  if (newPopup) {
+    newPopup.classList.add("open");
+    openPickerId = pickerId;
+  }
+}
+
+function changePickerYear(pickerId, delta, ev) {
+  if (ev) ev.stopPropagation();
+  const current = pickerNavState[pickerId] !== undefined ? pickerNavState[pickerId] : new Date().getFullYear();
+  pickerNavState[pickerId] = current + delta;
+  refreshPickerPopup(pickerId);
+}
+
+function changeYearRange(pickerId, delta, ev) {
+  if (ev) ev.stopPropagation();
+  const current = pickerNavState[pickerId] !== undefined ? pickerNavState[pickerId] : Math.floor(new Date().getFullYear() / 12) * 12;
+  pickerNavState[pickerId] = current + delta;
+  refreshPickerPopup(pickerId);
+}
+
+function selectMonthYear(pickerId, month, year, ev) {
+  if (ev) ev.stopPropagation();
+  const { type, field, entry } = getPickerContext(pickerId);
+  if (!entry) return;
+  entry[field] = month + " " + year;
+  closeAllDatePickers();
+  if (type === "exp") renderExpList(); else renderEduList();
+  generateResume();
+}
+
+function selectYear(pickerId, year, ev) {
+  if (ev) ev.stopPropagation();
+  const { entry, field } = getPickerContext(pickerId);
+  if (!entry) return;
+  entry[field] = String(year);
+  closeAllDatePickers();
+  renderEduList();
+  generateResume();
+}
+
+function toggleCurrentlyWorking(id, checked) {
+  const entry = expEntries.find((x) => x.id === id);
+  if (!entry) return;
+  entry.end = checked ? "Present" : "";
+  closeAllDatePickers();
+  renderExpList();
+  generateResume();
+}
+
+// Renders the month-grid + year-nav popup used for Experience Start/End dates
+function renderMonthYearPicker(pickerId, currentValue) {
+  const parsed = parseMonthYear(currentValue);
+  const navYear = pickerNavState[pickerId] !== undefined
+    ? pickerNavState[pickerId]
+    : (parsed ? parsed.year : new Date().getFullYear());
+  pickerNavState[pickerId] = navYear;
+
+  return `
+    <div class="date-picker-popup" id="popup-${pickerId}">
+      <div class="dp-year-nav">
+        <button type="button" class="dp-nav-btn" onclick="changePickerYear('${pickerId}', -1, event)"><i class="ti ti-chevron-left"></i></button>
+        <span class="dp-year-label">${navYear}</span>
+        <button type="button" class="dp-nav-btn" onclick="changePickerYear('${pickerId}', 1, event)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <div class="dp-month-grid">
+        ${MONTH_NAMES.map((m) => `<button type="button" class="dp-month-btn${parsed && parsed.month === m && parsed.year === navYear ? " selected" : ""}" onclick="selectMonthYear('${pickerId}', '${m}', ${navYear}, event)">${m}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+// Renders the year-grid + decade-nav popup used for Education Graduation Year
+function renderYearPicker(pickerId, currentValue) {
+  const selectedYear = currentValue ? parseInt(currentValue, 10) : null;
+  const defaultStart = Math.floor((selectedYear || new Date().getFullYear()) / 12) * 12;
+  const rangeStart = pickerNavState[pickerId] !== undefined ? pickerNavState[pickerId] : defaultStart;
+  pickerNavState[pickerId] = rangeStart;
+  const years = Array.from({ length: 12 }, (_, i) => rangeStart + i);
+
+  return `
+    <div class="date-picker-popup" id="popup-${pickerId}">
+      <div class="dp-year-nav">
+        <button type="button" class="dp-nav-btn" onclick="changeYearRange('${pickerId}', -12, event)"><i class="ti ti-chevron-left"></i></button>
+        <span class="dp-year-label">${years[0]} – ${years[years.length - 1]}</span>
+        <button type="button" class="dp-nav-btn" onclick="changeYearRange('${pickerId}', 12, event)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <div class="dp-year-grid">
+        ${years.map((y) => `<button type="button" class="dp-month-btn${y === selectedYear ? " selected" : ""}" onclick="selectYear('${pickerId}', ${y}, event)">${y}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+// ============================================================
 // 4. DYNAMIC ENTRY BLOCKS — EXPERIENCE
 // ============================================================
 function addExp() {
@@ -102,13 +252,27 @@ function renderExpList() {
       <div class="input-row">
         <div class="input-group">
           <label>Start Date</label>
-          <input placeholder="Jan 2022" value="${escHtml(e.start)}"
-            oninput="expEntries.find(x=>x.id===${e.id}).start=this.value; generateResume()">
+          <div class="date-input-wrapper">
+            <button type="button" class="date-display" onclick="toggleDatePicker('exp-start-${e.id}', event)">
+              <span>${e.start ? escHtml(e.start) : "Select date"}</span>
+              <i class="ti ti-calendar"></i>
+            </button>
+            ${renderMonthYearPicker(`exp-start-${e.id}`, e.start)}
+          </div>
         </div>
         <div class="input-group">
           <label>End Date</label>
-          <input placeholder="Present" value="${escHtml(e.end)}"
-            oninput="expEntries.find(x=>x.id===${e.id}).end=this.value; generateResume()">
+          <div class="date-input-wrapper">
+            <button type="button" class="date-display" onclick="toggleDatePicker('exp-end-${e.id}', event)" ${e.end === "Present" ? "disabled" : ""}>
+              <span>${e.end ? escHtml(e.end) : "Select date"}</span>
+              <i class="ti ti-calendar"></i>
+            </button>
+            ${renderMonthYearPicker(`exp-end-${e.id}`, e.end)}
+          </div>
+          <label class="present-check">
+            <input type="checkbox" ${e.end === "Present" ? "checked" : ""} onchange="toggleCurrentlyWorking(${e.id}, this.checked)">
+            <span>Currently working here</span>
+          </label>
         </div>
       </div>
       <div class="input-group">
@@ -159,8 +323,13 @@ function renderEduList() {
       <div class="input-row">
         <div class="input-group">
           <label>Graduation Year</label>
-          <input placeholder="2020" value="${escHtml(e.year)}"
-            oninput="eduEntries.find(x=>x.id===${e.id}).year=this.value; generateResume()">
+          <div class="date-input-wrapper">
+            <button type="button" class="date-display" onclick="toggleDatePicker('edu-year-${e.id}', event)">
+              <span>${e.year ? escHtml(e.year) : "Select year"}</span>
+              <i class="ti ti-calendar"></i>
+            </button>
+            ${renderYearPicker(`edu-year-${e.id}`, e.year)}
+          </div>
         </div>
         <div class="input-group">
           <label>GPA (optional)</label>

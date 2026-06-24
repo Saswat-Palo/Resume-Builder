@@ -275,6 +275,120 @@ textarea {
   position: relative;
 }
 
+/* ============================================================
+   DATE PICKER (click-only — no manual typing)
+   ============================================================ */
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-display {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 13px;
+  background: rgba(15, 23, 42, 0.6);
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.date-display:hover { border-color: rgba(99, 102, 241, 0.5); }
+.date-display:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18); }
+.date-display:disabled { cursor: not-allowed; opacity: 0.55; }
+.date-display span { color: var(--text-main); }
+.date-display i { color: var(--primary); font-size: 14px; flex-shrink: 0; margin-left: 8px; }
+
+.date-picker-popup {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 230px;
+  background: #1e293b;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  z-index: 60;
+}
+
+.date-picker-popup.open { display: block; }
+
+.dp-year-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.dp-year-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.dp-nav-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 7px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.dp-nav-btn:hover { color: var(--primary); background: var(--primary-light); }
+
+.dp-month-grid, .dp-year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.dp-month-btn {
+  padding: 7px 4px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  text-align: center;
+}
+
+.dp-month-btn:hover { border-color: rgba(99, 102, 241, 0.5); color: var(--primary); }
+.dp-month-btn.selected { background: var(--primary); color: white; }
+
+.present-check {
+  display: flex !important;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.present-check input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
 .remove-btn {
   position: absolute;
   top: 10px;
