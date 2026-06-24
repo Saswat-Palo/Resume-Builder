@@ -1,7 +1,3 @@
-// ============================================================
-// RESUME ASTRA — script.js
-// ============================================================
-
 const supabaseClient = window.supabase.createClient(
   "https://feqncmpoofgxyldxobzu.supabase.co",
   "sb_publishable_kL81VA7D6E08K4ObwB4Xrg_9Y_RAEcG"
@@ -444,86 +440,7 @@ function generateResume() {
 }
 
 // ============================================================
-// 9. AI SUMMARY GENERATOR
-// ============================================================
-async function aiImprove() {
-  const btn = document.getElementById("aiSummaryBtn");
-  const resultDiv = document.getElementById("aiSummaryResult");
-
-  const name   = gv("f-name");
-  const title  = gv("f-title");
-  const skills = gv("f-skills");
-  const expStr = expEntries.map((e) => `${e.role} at ${e.company}`).filter(Boolean).join(", ");
-
-  if (!name && !title && !expStr) {
-    resultDiv.style.display = "block";
-    resultDiv.className = "ai-result ai-error";
-    resultDiv.textContent = "Please fill in your name, target role, or at least one work experience first.";
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader ai-spin"></i> Writing your summary...';
-  resultDiv.style.display = "none";
-
-  const prompt = `Write a punchy 2–3 sentence professional resume summary for:
-Name: ${name || "N/A"}
-Target Role: ${title || "N/A"}
-Experience: ${expStr || "N/A"}
-Key Skills: ${skills || "N/A"}
-
-Rules:
-- Concise and impactful, no filler words
-- Achievement-focused, not just duty-focused
-- Written in third person (no "I")
-- Do NOT include quotes, labels, or preamble — return only the summary text itself.`;
-
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    const data = await res.json();
-    const text = data.content?.find((b) => b.type === "text")?.text || "Could not generate summary.";
-
-    resultDiv.style.display = "block";
-    resultDiv.className = "ai-result ai-success";
-    resultDiv.innerHTML = `
-      <div class="ai-result-label"><i class="ti ti-sparkles"></i> AI Suggestion — click to use</div>
-      <div class="ai-result-text">${text}</div>
-      <button class="ai-use-btn" onclick="useAISummary(this)">Use this summary</button>`;
-
-    // Store text for the use button
-    resultDiv.dataset.aiText = text;
-  } catch (err) {
-    resultDiv.style.display = "block";
-    resultDiv.className = "ai-result ai-error";
-    resultDiv.textContent = "AI is unavailable right now. Please try again shortly.";
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-sparkles"></i> Write Summary with AI';
-}
-
-function useAISummary(btn) {
-  const resultDiv = document.getElementById("aiSummaryResult");
-  const text = resultDiv.dataset.aiText || "";
-  const summaryField = document.getElementById("f-summary");
-  if (summaryField) {
-    summaryField.value = text;
-    generateResume();
-  }
-  resultDiv.style.display = "none";
-}
-
-// ============================================================
-// 10. SAVE & DOWNLOAD
+// 9. SAVE & DOWNLOAD
 // ============================================================
 async function saveAndDownload() {
   const downloadBtn = document.getElementById("downloadBtn");
@@ -535,7 +452,7 @@ async function saveAndDownload() {
     return;
   }
 
-  downloadBtn.innerHTML = '<i class="ti ti-loader ai-spin"></i> Saving & Generating...';
+  downloadBtn.innerHTML = '<i class="ti ti-loader"></i> Saving & Generating...';
   downloadBtn.disabled = true;
 
   const resumeData = {

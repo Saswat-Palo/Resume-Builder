@@ -33,7 +33,7 @@
     <div class="glass-card text-center">
       <div class="login-icon">📄</div>
       <h2>Welcome to Resume Astra</h2>
-      <p>Sign in to build, save, and download your professional resume with AI-powered suggestions.</p>
+      <p>Sign in to build, save, and download your professional resume.</p>
       <button class="btn-primary auth-btn" onclick="signInWithGoogle()">
         <i class="ti ti-brand-google"></i> Sign in with Google
       </button>
@@ -103,10 +103,6 @@
         </div>
 
         <div class="section-label" style="margin-top: 8px;"><i class="ti ti-file-text"></i> Professional Summary</div>
-        <button class="ai-btn" id="aiSummaryBtn" onclick="aiImprove()">
-          <i class="ti ti-sparkles"></i> Write Summary with AI
-        </button>
-        <div class="ai-result" id="aiSummaryResult"></div>
         <div class="input-group">
           <textarea id="f-summary" placeholder="A brief 2–3 sentence professional summary about your background, strengths, and goals..." oninput="generateResume()"></textarea>
         </div>
