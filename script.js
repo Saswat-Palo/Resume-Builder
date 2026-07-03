@@ -465,11 +465,11 @@ function generateResume() {
 
   // Contact row
   const contactItems = [
-    email    ? `<span class="r-contact"><i class="ti ti-mail"></i>${email}</span>` : "",
+    email    ? `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}" target="_blank" rel="noopener noreferrer" class="r-contact"><i class="ti ti-mail"></i>${email}</a>` : "",
     phone    ? `<span class="r-contact"><i class="ti ti-phone"></i>${phone}</span>` : "",
     location ? `<span class="r-contact"><i class="ti ti-map-pin"></i>${location}</span>` : "",
-    linkedin ? `<span class="r-contact"><i class="ti ti-brand-linkedin"></i>${linkedin}</span>` : "",
-    website  ? `<span class="r-contact"><i class="ti ti-world"></i>${website}</span>` : "",
+    linkedin ? `<a href="https://${linkedin.replace(/^https?:\/\//,"")}" target="_blank" rel="noopener noreferrer" class="r-contact"><i class="ti ti-brand-linkedin"></i>${linkedin}</a>` : "",
+    website  ? `<a href="https://${website.replace(/^https?:\/\//,"")}" target="_blank" rel="noopener noreferrer" class="r-contact"><i class="ti ti-world"></i>${website}</a>` : "",
   ].filter(Boolean).join("");
 
   // Summary
