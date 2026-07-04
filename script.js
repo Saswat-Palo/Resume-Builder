@@ -3,14 +3,10 @@ const supabaseClient = window.supabase.createClient(
   "sb_publishable_kL81VA7D6E08K4ObwB4Xrg_9Y_RAEcG"
 );
 
-// --- STATE ---
 let expEntries = [];
 let eduEntries = [];
 let projEntries = [];
 
-// ============================================================
-// 1. INITIALIZATION
-// ============================================================
 window.onload = () => {
   generateResume();
   renderExpList();
@@ -36,9 +32,6 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
   }
 });
 
-// ============================================================
-// 2. AUTHENTICATION
-// ============================================================
 async function signInWithGoogle() {
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: "google",
@@ -52,9 +45,6 @@ async function signOut() {
   if (error) alert("Error logging out: " + error.message);
 }
 
-// ============================================================
-// 3. TABS
-// ============================================================
 function switchTab(name, clickedBtn) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
   document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
@@ -62,9 +52,6 @@ function switchTab(name, clickedBtn) {
   document.getElementById("tab-" + name).classList.add("active");
 }
 
-// ============================================================
-// DATE PICKER (MONTH/YEAR & YEAR) — NO MANUAL TYPING
-// ============================================================
 const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 let openPickerId = null;
 let pickerNavState = {}; // pickerId -> year (month-year picker) or decade start (year picker)
@@ -78,7 +65,6 @@ function parseMonthYear(value) {
   return null;
 }
 
-// Resolves a pickerId like "exp-start-12345" or "edu-year-12345" back to its entry
 function getPickerContext(pickerId) {
   const parts = pickerId.split("-");
   const type = parts[0];
@@ -106,7 +92,6 @@ function closeAllDatePickers() {
   openPickerId = null;
 }
 
-// Close any open picker when clicking outside of it
 document.addEventListener("click", (e) => {
   if (openPickerId && !e.target.closest(".date-input-wrapper")) {
     closeAllDatePickers();
@@ -170,7 +155,6 @@ function toggleCurrentlyWorking(id, checked) {
   generateResume();
 }
 
-// Renders the month-grid + year-nav popup used for Experience Start/End dates
 function renderMonthYearPicker(pickerId, currentValue) {
   const parsed = parseMonthYear(currentValue);
   const navYear = pickerNavState[pickerId] !== undefined
@@ -191,7 +175,6 @@ function renderMonthYearPicker(pickerId, currentValue) {
     </div>`;
 }
 
-// Renders the year-grid + decade-nav popup used for Education Graduation Year
 function renderYearPicker(pickerId, currentValue) {
   const selectedYear = currentValue ? parseInt(currentValue, 10) : null;
   const defaultStart = Math.floor((selectedYear || new Date().getFullYear()) / 12) * 12;
@@ -212,9 +195,6 @@ function renderYearPicker(pickerId, currentValue) {
     </div>`;
 }
 
-// ============================================================
-// 4. DYNAMIC ENTRY BLOCKS — EXPERIENCE
-// ============================================================
 function addExp() {
   const id = Date.now();
   expEntries.push({ id, company: "", role: "", start: "", end: "", bullets: "" });
@@ -285,9 +265,6 @@ function renderExpList() {
     .join("");
 }
 
-// ============================================================
-// 5. DYNAMIC ENTRY BLOCKS — EDUCATION
-// ============================================================
 function addEdu() {
   const id = Date.now();
   eduEntries.push({ id, degree: "", school: "", year: "", gpa: "" });
@@ -342,9 +319,6 @@ function renderEduList() {
     .join("");
 }
 
-// ============================================================
-// 6. DYNAMIC ENTRY BLOCKS — PROJECTS
-// ============================================================
 function addProj() {
   const id = Date.now();
   projEntries.push({ id, name: "", tech: "", desc: "", link: "" });
@@ -392,9 +366,6 @@ function renderProjList() {
     .join("");
 }
 
-// ============================================================
-// 7. PROGRESS & CHECKLIST
-// ============================================================
 function updateProgress() {
   const checks = {
     Name: !!gv("f-name"),
@@ -430,9 +401,6 @@ function updateProgress() {
   }
 }
 
-// ============================================================
-// 8. LIVE RESUME GENERATION                                   
-// ============================================================
 function generateResume() {
   updateProgress();
 
@@ -463,7 +431,6 @@ function generateResume() {
     return;
   }
 
-  // Contact row
   const contactItems = [
     email    ? `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}" target="_blank" rel="noopener noreferrer" class="r-contact"><i class="ti ti-mail"></i>${email}</a>` : "",
     phone    ? `<span class="r-contact"><i class="ti ti-phone"></i>${phone}</span>` : "",
@@ -472,7 +439,6 @@ function generateResume() {
     website  ? `<a href="https://${website.replace(/^https?:\/\//,"")}" target="_blank" rel="noopener noreferrer" class="r-contact"><i class="ti ti-world"></i>${website}</a>` : "",
   ].filter(Boolean).join("");
 
-  // Summary
   const summaryHTML = summary
     ? `<div class="r-section">
         <div class="r-section-title">Summary</div>
@@ -480,7 +446,6 @@ function generateResume() {
       </div>`
     : "";
 
-  // Experience
   const expHTML =
     expEntries.length > 0
       ? `<div class="r-section">
@@ -511,7 +476,6 @@ function generateResume() {
         </div>`
       : "";
 
-  // Education
   const eduHTML =
     eduEntries.length > 0
       ? `<div class="r-section">
@@ -529,7 +493,6 @@ function generateResume() {
         </div>`
       : "";
 
-  // Skills
   const skillsHTML = skills
     ? `<div class="r-section">
         <div class="r-section-title">Skills</div>
@@ -539,7 +502,6 @@ function generateResume() {
       </div>`
     : "";
 
-  // Projects
   const projHTML =
     projEntries.length > 0
       ? `<div class="r-section">
@@ -560,7 +522,6 @@ function generateResume() {
         </div>`
       : "";
 
-  // Certifications
   const certsHTML = certs
     ? `<div class="r-section">
         <div class="r-section-title">Certifications</div>
@@ -570,7 +531,6 @@ function generateResume() {
       </div>`
     : "";
 
-  // Languages
   const langsHTML = langs
     ? `<div class="r-section">
         <div class="r-section-title">Languages</div>
@@ -608,9 +568,6 @@ function generateResume() {
   `;
 }
 
-// ============================================================
-// 9. SAVE & DOWNLOAD
-// ============================================================
 async function saveAndDownload() {
   const downloadBtn = document.getElementById("downloadBtn");
   const originalText = downloadBtn.innerHTML;
@@ -674,9 +631,6 @@ function triggerPDF() {
   html2pdf().set(options).from(element).save();
 }
 
-// ============================================================
-// UTILITIES
-// ============================================================
 function gv(id) {
   const el = document.getElementById(id);
   return el ? el.value.trim() : "";

@@ -11,7 +11,6 @@
 
 <body>
 
-  <!-- APP INTRO -->
 <div id="intro-screen">
   <div class="intro-content">
     <div class="intro-logo">Resume Astra</div>
@@ -22,13 +21,11 @@
   </div>
 </div>
 
-  <!-- APP HEADER -->
   <header class="app-header">
     <h1>Resume <span>Astra</span></h1>
     <p class="app-tagline">Resumes made Simple</p>
   </header>
 
-  <!-- LOGIN SCREEN -->
   <div id="login-screen" class="login-container">
     <div class="glass-card text-center">
       <div class="login-icon">📄</div>
@@ -40,20 +37,16 @@
     </div>
   </div>
 
-  <!-- MAIN APP -->
   <div class="container" id="app-container" style="display: none;">
 
-    <!-- LEFT: FORM SIDEBAR -->
     <div class="form-panel glass-card">
 
-      <!-- Progress -->
       <div class="progress-header">
         <span class="progress-label" id="progressLabel">0% complete</span>
         <span class="progress-hint" id="progressHint">Fill in your details</span>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
-      <!-- Tabs -->
       <div class="tabs">
         <button class="tab active" onclick="switchTab('basics', this)"><i class="ti ti-user"></i> Basics</button>
         <button class="tab" onclick="switchTab('experience', this)"><i class="ti ti-briefcase"></i> Work</button>
@@ -61,7 +54,6 @@
         <button class="tab" onclick="switchTab('extras', this)"><i class="ti ti-sparkles"></i> More</button>
       </div>
 
-      <!-- TAB: BASICS -->
       <div class="tab-panel active" id="tab-basics">
         <div class="section-label"><i class="ti ti-id-badge"></i> Personal Info</div>
 
@@ -117,14 +109,12 @@
         </div>
       </div>
 
-      <!-- TAB: EXPERIENCE -->
       <div class="tab-panel" id="tab-experience">
         <div class="section-label"><i class="ti ti-briefcase"></i> Work Experience</div>
         <div id="exp-list"></div>
         <button class="add-btn" onclick="addExp()"><i class="ti ti-plus"></i> Add Experience</button>
       </div>
 
-      <!-- TAB: EDUCATION -->
       <div class="tab-panel" id="tab-education">
         <div class="section-label"><i class="ti ti-school"></i> Education</div>
         <div id="edu-list"></div>
@@ -136,7 +126,6 @@
         </div>
       </div>
 
-      <!-- TAB: EXTRAS -->
       <div class="tab-panel" id="tab-extras">
         <div class="section-label"><i class="ti ti-code"></i> Skills</div>
         <div class="input-group">
@@ -158,7 +147,6 @@
         </div>
       </div>
 
-      <!-- BOTTOM ACTIONS -->
       <div class="action-buttons">
         <div class="checklist-row" id="scoreChips"></div>
         <button id="downloadBtn" class="btn-primary full-width" onclick="saveAndDownload()">
@@ -170,7 +158,6 @@
       </div>
     </div>
 
-    <!-- RIGHT: LIVE PREVIEW -->
     <div class="preview-panel">
       <div class="preview-toolbar">
         <span class="preview-label"><i class="ti ti-eye"></i> Live Preview</span>
