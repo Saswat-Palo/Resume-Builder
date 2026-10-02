@@ -26,8 +26,12 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from .gemini_service import stream_text, get_client, extract_json
-from .routes_ai import ExperienceItem, EducationItem, ProjectItem, ai_error
+if __package__:
+    from .gemini_service import stream_text, get_client, extract_json
+    from .routes_ai import ExperienceItem, EducationItem, ProjectItem, ai_error
+else:
+    from gemini_service import stream_text, get_client, extract_json
+    from routes_ai import ExperienceItem, EducationItem, ProjectItem, ai_error
 
 router = APIRouter(prefix="/api/ai", tags=["ai-build"])
 

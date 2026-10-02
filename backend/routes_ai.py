@@ -4,7 +4,10 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from .gemini_service import generate_text, extract_json, MissingApiKeyError
+if __package__:
+    from .gemini_service import generate_text, extract_json, MissingApiKeyError
+else:
+    from gemini_service import generate_text, extract_json, MissingApiKeyError
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
