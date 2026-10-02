@@ -8,8 +8,12 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes_ai import router as ai_router
-from .routes_build import router as build_router
+if __package__:
+    from .routes_ai import router as ai_router
+    from .routes_build import router as build_router
+else:
+    from routes_ai import router as ai_router
+    from routes_build import router as build_router
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
