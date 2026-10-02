@@ -1,11 +1,7 @@
-from pathlib import Path
-
 from dotenv import load_dotenv
-
-load_dotenv()  # reads .env before anything touches GEMINI_API_KEY
+load_dotenv() 
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 if __package__:
@@ -15,12 +11,9 @@ else:
     from routes_ai import router as ai_router
     from routes_build import router as build_router
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_DIR = BASE_DIR / "public"
-
 app = FastAPI(title="Resume Astra API")
 
-# Harmless in same-origin deployment; keeps things working if you ever split frontend/backend hosts.
+# CORS middleware zaroori hai taaki frontend API ko call kar sake
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,11 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API routes are registered first so they take priority over the catch-all static mount below.
+# Sirf API routes rahenge, static folder ka mount hata diya
 app.include_router(ai_router)
 app.include_router(build_router)
 
-# Serves index.html at "/", and style.css / script.js alongside it, with SPA-style index fallback.
-# Vercel par folder missing hone par crash prevent karne ke liye condition
-if STATIC_DIR.exists():
-    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+# Ek simple health check route (optional, but good for debugging)
+@app.get("/api/health")
+def health_check():
+    return {"status": "Backend is running fine!"}
