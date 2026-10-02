@@ -13,6 +13,10 @@
       "destination": {
         "service": "backend"
       }
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
     }
   ]
 }
