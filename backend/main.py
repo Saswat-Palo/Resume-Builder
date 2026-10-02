@@ -13,7 +13,6 @@ else:
 
 app = FastAPI(title="Resume Astra API")
 
-# CORS middleware zaroori hai taaki frontend API ko call kar sake
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,11 +20,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Sirf API routes rahenge, static folder ka mount hata diya
 app.include_router(ai_router)
 app.include_router(build_router)
-
-# Ek simple health check route (optional, but good for debugging)
-@app.get("/api/health")
-def health_check():
-    return {"status": "Backend is running fine!"}
