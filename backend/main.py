@@ -16,7 +16,7 @@ else:
     from routes_build import router as build_router
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_DIR = BASE_DIR / "static"
+STATIC_DIR = BASE_DIR / "public"
 
 app = FastAPI(title="Resume Astra API")
 
@@ -33,4 +33,6 @@ app.include_router(ai_router)
 app.include_router(build_router)
 
 # Serves index.html at "/", and style.css / script.js alongside it, with SPA-style index fallback.
-app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+# Vercel par folder missing hone par crash prevent karne ke liye condition
+if STATIC_DIR.exists():
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
