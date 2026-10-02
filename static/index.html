@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Resume Astra</title>
+  <meta name="description" content="Build an ATS-friendly resume with AI. Watch it write itself, then check its ATS score.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f3f5fb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Resume Astra">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <!-- Set the theme before first paint so there is no light/dark flash -->
+  <script>
+    (function () {
+      var t = "light";
+      try {
+        var saved = localStorage.getItem("raTheme");
+        t = saved === "dark" || saved === "light" ? saved : (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      } catch (e) {}
+      document.documentElement.setAttribute("data-theme", t);
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", t === "dark" ? "#0a0f1e" : "#f3f5fb");
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+</head>
+<body data-view="edit">
+
+<div id="intro-screen">
+  <div class="intro-content">
+    <div class="intro-logo">
+      <img class="logo logo-light" src="assets/logo.png" width="760" height="129" alt="ResumeAstra">
+      <img class="logo logo-dark" src="assets/logo-dark.png" width="760" height="129" alt="" aria-hidden="true">
+    </div>
+    <div class="intro-subtitle">Your Next Opportunity Starts Here<br>Resumes made Simple - now with AI</div>
+  </div>
+</div>
+
+<header class="app-header">
+  <div class="app-header-brand">
+    <h1 class="brand-logo">
+      <img class="logo logo-light" src="assets/logo.png" width="760" height="129" alt="ResumeAstra">
+      <img class="logo logo-dark" src="assets/logo-dark.png" width="760" height="129" alt="" aria-hidden="true">
+    </h1>
+    <p class="app-tagline">Resumes made Simple - now with AI</p>
+  </div>
+  <div class="app-header-right">
+    <button type="button" class="icon-btn theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Switch to dark mode" title="Switch to dark mode">
+      <i class="ti ti-moon theme-icon-moon" aria-hidden="true"></i><i class="ti ti-sun theme-icon-sun" aria-hidden="true"></i>
+    </button>
+    <div class="app-header-actions" id="headerActions" style="display:none;">
+      <button class="ghost-btn" onclick="signOut()" aria-label="Sign out"><i class="ti ti-logout"></i> <span class="btn-label">Sign Out</span></button>
+    </div>
+  </div>
+</header>
+
+<div id="login-screen" class="login-container" style="display:none;">
+  <div class="glass-card text-center login-card">
+    <img class="login-mark" src="assets/logo-mark.png" width="72" height="72" alt="">
+    <h2>Welcome to Resume Astra</h2>
+    <p>Sign in to build, save, and download your professional resume.</p>
+    <ul class="login-points">
+      <li><i class="ti ti-sparkles"></i> Watch AI write your resume live</li>
+      <li><i class="ti ti-radar-2"></i> Instant ATS score with fixes</li>
+      <li><i class="ti ti-download"></i> One-click PDF download</li>
+    </ul>
+    <button class="btn-primary auth-btn" onclick="signInWithGoogle()">
+      <i class="ti ti-brand-google"></i> Sign in with Google
+    </button>
+  </div>
+</div>
+
+<div class="container" id="app-container" style="display:none;">
+
+  <div class="form-panel glass-card">
+
+    <div class="progress-header">
+      <span class="progress-label" id="progressLabel">0% complete</span>
+      <span class="progress-hint" id="progressHint">Fill in your details</span>
+      <span class="autosave-status" id="autosaveStatus"><i class="ti ti-device-floppy"></i> <span id="autosaveText">Draft auto-saves locally</span></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div class="tabs" id="mainTabs">
+      <button class="tab tab-ai active" onclick="switchTab('guided', this)"><i class="ti ti-wand"></i> <span>AI Build</span></button>
+      <button class="tab" onclick="switchTab('basics', this)"><i class="ti ti-user"></i> <span>Basics</span></button>
+      <button class="tab" onclick="switchTab('experience', this)"><i class="ti ti-briefcase"></i> <span>Work</span></button>
+      <button class="tab" onclick="switchTab('education', this)"><i class="ti ti-school"></i> <span>Edu</span></button>
+      <button class="tab" onclick="switchTab('extras', this)"><i class="ti ti-sparkles"></i> <span>More</span></button>
+    </div>
+
+    <!-- AI BUILD (guided: personal details + education + target role -> Generate) -->
+    <div class="tab-panel active" id="tab-guided">
+      <div class="guided-hero">
+        <div class="guided-hero-badge"><i class="ti ti-sparkles"></i></div>
+        <div>
+          <h2 class="guided-title">Build with AI</h2>
+          <p class="guided-sub">Share who you are, where you studied and the role you want. AI writes the rest - and you watch your resume build in the live preview.</p>
+        </div>
+      </div>
+
+      <div class="guided-step-label"><span class="gs-num">1</span> Personal details</div>
+      <div class="input-group">
+        <label for="g-name">Full name <span class="req">*</span></label>
+        <input type="text" id="g-name" placeholder="e.g. Riya Kar" autocomplete="name" oninput="onFieldInput('name', this.value)">
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label for="g-email">Email <span class="req">*</span></label>
+          <input type="email" id="g-email" placeholder="riya@email.com" autocomplete="email" oninput="onFieldInput('email', this.value)">
+        </div>
+        <div class="input-group">
+          <label for="g-phone">Phone</label>
+          <input type="tel" id="g-phone" placeholder="+91 77400xxxx1" autocomplete="tel" oninput="onFieldInput('phone', this.value)">
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label for="g-location">Location</label>
+          <input type="text" id="g-location" placeholder="Odisha, India" oninput="onFieldInput('location', this.value)">
+        </div>
+        <div class="input-group">
+          <label for="g-linkedin">LinkedIn</label>
+          <input type="text" id="g-linkedin" placeholder="linkedin.com/in/riya" oninput="onFieldInput('linkedin', this.value)">
+        </div>
+      </div>
+
+      <div class="guided-step-label"><span class="gs-num">2</span> Education <span class="req">*</span></div>
+      <div id="guided-edu-list"></div>
+      <button class="add-btn" onclick="addEduGuided()"><i class="ti ti-plus"></i> Add education</button>
+
+      <div class="guided-step-label"><span class="gs-num">3</span> Target role</div>
+      <div class="input-row input-row-wide">
+        <div class="input-group">
+          <label for="g-role">Role you want <span class="req">*</span></label>
+          <input type="text" id="g-role" placeholder="e.g. Data Analyst" oninput="onFieldInput('title', this.value)">
+        </div>
+        <div class="input-group">
+          <label for="g-level">Experience level</label>
+          <select id="g-level" onchange="onGuidedExtra('level', this.value)">
+            <option value="">Not sure</option>
+            <option value="student">Student / fresher</option>
+            <option value="entry">Entry level (0-2 yrs)</option>
+            <option value="mid">Mid level (3-6 yrs)</option>
+            <option value="senior">Senior (7+ yrs)</option>
+          </select>
+        </div>
+      </div>
+
+      <details class="guided-optional">
+        <summary><i class="ti ti-adjustments-horizontal"></i> Optional: skills &amp; experience notes for a richer resume</summary>
+        <div class="input-group">
+          <label for="g-skills">Skills you already have</label>
+          <textarea id="g-skills" placeholder="Python, SQL, Excel, JavaScript" oninput="onFieldInput('skills', this.value)" style="min-height:64px;"></textarea>
+        </div>
+        <div class="input-group">
+          <label for="g-background">Internships, jobs or projects (rough notes are fine)</label>
+          <textarea id="g-background" placeholder="e.g. 3-month data internship at XYZ in 2025 making Power BI dashboards. Built a movie recommender for my final-year project." oninput="onGuidedExtra('background', this.value)"></textarea>
+        </div>
+      </details>
+
+      <p class="ai-error-note guided-error" id="guidedError" style="display:none;"><i class="ti ti-alert-triangle"></i> <span></span></p>
+
+      <button class="generate-cta" id="generateBtn" onclick="startGuidedBuild()">
+        <i class="ti ti-wand"></i> <span id="generateBtnText">Generate my resume</span>
+      </button>
+      <p class="guided-foot"><i class="ti ti-shield-check"></i> AI only uses what you enter here - it won't invent employers, dates or numbers.</p>
+
+      <div class="build-card" id="buildCard" hidden>
+        <div class="build-card-head">
+          <div class="build-card-title"><span class="build-pulse"></span> <span id="buildTitle">Building your resume</span></div>
+          <button type="button" class="build-skip" id="skipAnimBtn" onclick="skipBuildAnimation()"><i class="ti ti-player-track-next"></i> Skip animation</button>
+        </div>
+        <ol class="build-steps" id="buildSteps"></ol>
+        <p class="build-status" id="buildStatus"></p>
+      </div>
+
+      <div class="guided-done" id="guidedDone" hidden>
+        <div class="guided-done-head"><i class="ti ti-circle-check"></i> <span id="guidedDoneTitle">Your resume is ready</span></div>
+        <p id="guidedDoneText">Review it in the live preview, then check how it scores with applicant tracking systems.</p>
+        <div class="guided-done-actions">
+          <button type="button" class="ats-cta" onclick="openATS()"><i class="ti ti-radar-2"></i> Check ATS score</button>
+          <button type="button" class="ghost-btn" onclick="switchTabByName('basics')"><i class="ti ti-edit"></i> Edit details</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BASICS -->
+    <div class="tab-panel" id="tab-basics">
+      <div class="section-label"><i class="ti ti-id-badge"></i> Personal Info</div>
+
+      <div class="photo-upload-row">
+        <div class="photo-drop" id="photoDrop" role="button" tabindex="0" aria-label="Upload profile photo">
+          <img id="photoImg" alt="Profile photo preview" style="display:none;">
+          <div class="photo-placeholder" id="photoPlaceholder"><i class="ti ti-camera-plus"></i></div>
+          <div class="photo-drop-overlay"><i class="ti ti-camera"></i></div>
+        </div>
+        <div class="photo-upload-meta">
+          <div class="photo-upload-actions">
+            <button type="button" class="photo-btn" onclick="document.getElementById('photoInput').click()">
+              <i class="ti ti-upload"></i> Upload photo
+            </button>
+            <button type="button" class="photo-btn photo-btn-remove" id="removePhotoBtn" onclick="removePhoto()" style="display:none;">
+              <i class="ti ti-trash"></i> Remove
+            </button>
+          </div>
+          <label class="present-check photo-toggle" id="photoToggleWrap" style="display:none;">
+            <input type="checkbox" id="f-show-photo" checked onchange="onShowPhotoChange(this.checked)">
+            <span>Show photo on resume</span>
+          </label>
+          <p class="photo-hint">JPG, PNG or WEBP &middot; up to 5MB &middot; square photos look best</p>
+        </div>
+        <input type="file" id="photoInput" accept="image/png,image/jpeg,image/webp" hidden onchange="handlePhotoUpload(event)">
+      </div>
+
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Rahul Sharma" oninput="onFieldInput('name', this.value)">
+      </div>
+
+      <div class="input-group">
+        <label>Job Title / Target Role</label>
+        <input type="text" id="f-title" placeholder="e.g. Senior Product Designer" oninput="onFieldInput('title', this.value)">
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" id="f-email" placeholder="amrit@email.com" oninput="onFieldInput('email', this.value)">
+        </div>
+        <div class="input-group">
+          <label>Phone</label>
+          <input type="tel" id="f-phone" placeholder="+91 77400xxxx1" oninput="onFieldInput('phone', this.value)">
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label>Location</label>
+          <input type="text" id="f-location" placeholder="New Delhi, India" oninput="onFieldInput('location', this.value)">
+        </div>
+        <div class="input-group">
+          <label>LinkedIn</label>
+          <input type="text" id="f-linkedin" placeholder="linkedin.com/in/amrit" oninput="onFieldInput('linkedin', this.value)">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Portfolio / Website</label>
+        <input type="text" id="f-website" placeholder="rohitdesigns.com" oninput="onFieldInput('website', this.value)">
+      </div>
+
+      <!-- Paste-your-bio autofill (original one-shot AI feature, unchanged) -->
+      <div class="ai-intake">
+        <div class="ai-intake-inner">
+          <div class="ai-intake-header">
+            <div class="ai-intake-badge"><i class="ti ti-sparkles"></i></div>
+            <div class="ai-intake-title">Have a bio? Paste it and let AI build your resume</div>
+          </div>
+          <p class="ai-intake-sub">
+            Paste your LinkedIn "About", an old resume, or just describe your career in your own words.
+            AI will write your title, summary, skills, and achievement bullets - you only need to add contact details and review.
+          </p>
+          <textarea id="ai-raw-text" placeholder="e.g. I've been a frontend developer for 4 years, currently at ABC Labs building their design system in React. Before that I was at a startup called XYZ doing full-stack work for 2 years. I know TypeScript, React, Node, and some Figma. I have a CS degree from QWERTY University, 2019..."></textarea>
+          <button class="ai-intake-cta" id="aiIntakeBtn" onclick="runAutofill()">
+            <i class="ti ti-wand"></i> <span id="aiIntakeBtnText">Generate my resume</span>
+          </button>
+          <p class="ai-error-note" id="aiIntakeError" style="display:none; margin-top:10px;"><i class="ti ti-alert-triangle"></i> <span></span></p>
+          <div class="ai-intake-success" id="aiIntakeSuccess" style="display:none;"><i class="ti ti-circle-check"></i> Draft ready - check the Work, Edu &amp; More tabs</div>
+          <p class="ai-intake-footnote"><i class="ti ti-shield-check"></i> AI only uses what you write here - it won't invent employers, dates, or numbers you didn't mention.</p>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top: 8px;"><i class="ti ti-file-text"></i> Professional Summary</div>
+      <div class="input-group">
+        <div class="ai-field-row">
+          <label style="margin:0;">2-3 sentence summary</label>
+          <button type="button" class="ai-btn" id="summaryAIBtn" onclick="generateSummaryAI()">
+            <i class="ti ti-refresh"></i> <span>Regenerate</span>
+          </button>
+        </div>
+        <textarea id="f-summary" placeholder="A brief 2–3 sentence professional summary about your background, strengths, and goals..." oninput="onFieldInput('summary', this.value)"></textarea>
+        <p class="ai-error-note" id="summaryAIError" style="display:none;"><i class="ti ti-alert-triangle"></i> <span></span></p>
+      </div>
+
+      <div class="section-label" style="margin-top: 8px;"><i class="ti ti-layout"></i> Template</div>
+      <div class="input-group">
+        <select id="f-template" onchange="onFieldInput('template', this.value)">
+          <option value="template-classic">Classic - Professional</option>
+          <option value="template-modern">Modern - Teal Accent</option>
+          <option value="template-minimalist">Minimalist - Clean</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <div class="tab-panel" id="tab-experience">
+      <div class="section-label"><i class="ti ti-briefcase"></i> Work Experience</div>
+      <div id="exp-list"></div>
+      <button class="add-btn" onclick="addExp()"><i class="ti ti-plus"></i> Add Experience</button>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="tab-panel" id="tab-education">
+      <div class="section-label"><i class="ti ti-school"></i> Education</div>
+      <div id="edu-list"></div>
+      <button class="add-btn" onclick="addEdu()"><i class="ti ti-plus"></i> Add Education</button>
+
+      <div class="section-label" style="margin-top: 18px;"><i class="ti ti-award"></i> Certifications</div>
+      <div class="input-group">
+        <textarea id="f-certs" placeholder="AWS Certified Developer, 2024&#10;Google Analytics Certified, 2023" oninput="onFieldInput('certs', this.value)"></textarea>
+      </div>
+    </div>
+
+    <!-- EXTRAS -->
+    <div class="tab-panel" id="tab-extras">
+      <div class="section-label"><i class="ti ti-code"></i> Skills</div>
+      <div class="input-group">
+        <textarea id="f-skills" placeholder="React, TypeScript, Figma, Python, SQL, Node.js" oninput="onFieldInput('skills', this.value)" style="min-height: 70px;"></textarea>
+      </div>
+
+      <div class="section-label" style="margin-top: 4px;"><i class="ti ti-rocket"></i> Projects</div>
+      <div id="proj-list"></div>
+      <button class="add-btn" onclick="addProj()"><i class="ti ti-plus"></i> Add Project</button>
+
+      <div class="section-label" style="margin-top: 18px;"><i class="ti ti-language"></i> Languages</div>
+      <div class="input-group">
+        <textarea id="f-langs" placeholder="English, Hindi, Spanish" oninput="onFieldInput('langs', this.value)" style="min-height: 70px;"></textarea>
+      </div>
+
+      <div class="section-label" style="margin-top: 4px;"><i class="ti ti-heart"></i> Interests / Hobbies</div>
+      <div class="input-group">
+        <textarea id="f-hobbies" placeholder="Rock climbing, open-source contribution, photography" oninput="onFieldInput('hobbies', this.value)" style="min-height: 70px;"></textarea>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <div class="checklist-row" id="scoreChips"></div>
+
+      <!-- ATS check: revealed once the resume is generated (or is already well filled in) -->
+      <button class="ats-trigger" id="atsTriggerBtn" onclick="openATS()" hidden><i class="ti ti-radar-2"></i> Check ATS Score</button>
+      <p class="ats-locked-hint" id="atsLockedHint"><i class="ti ti-lock"></i> ATS check unlocks once your resume is generated.</p>
+
+      <button id="downloadBtn" class="btn-primary full-width" onclick="saveAndDownload()">
+        <i class="ti ti-download"></i> <span id="downloadBtnText">Save & Download PDF</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="preview-panel">
+    <div class="preview-toolbar">
+      <div class="preview-title">
+        <span class="preview-label"><span class="live-dot"></span> Live Preview</span>
+        <span class="preview-hint" id="previewStatus" data-state="idle">Updates as you type</span>
+      </div>
+      <div class="preview-tools">
+        <button type="button" class="skip-chip" id="previewSkipBtn" onclick="skipBuildAnimation()" hidden><i class="ti ti-player-track-next"></i> Skip animation</button>
+        <div class="template-chips" id="templateChips" role="group" aria-label="Resume template">
+          <button type="button" class="tpl-chip" data-tpl="template-classic" onclick="setTemplate('template-classic')"><span class="tpl-swatch tpl-classic"></span>Classic</button>
+          <button type="button" class="tpl-chip" data-tpl="template-modern" onclick="setTemplate('template-modern')"><span class="tpl-swatch tpl-modern"></span>Modern</button>
+          <button type="button" class="tpl-chip" data-tpl="template-minimalist" onclick="setTemplate('template-minimalist')"><span class="tpl-swatch tpl-minimal"></span>Minimal</button>
+        </div>
+        <button type="button" class="ats-toolbar-btn" id="atsToolbarBtn" onclick="openATS()" hidden><i class="ti ti-radar-2"></i> Check ATS score</button>
+      </div>
+    </div>
+    <div class="paper-preview" id="preview">
+      <div class="preview-empty">
+        <div class="preview-empty-icon"><i class="ti ti-file-text"></i></div>
+        <p>Fill in the AI Build form and press <strong>Generate</strong><br>to watch your resume write itself here</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="mobile-nav" id="mobileNav" aria-label="Editor views">
+  <div class="mobile-seg" role="tablist">
+    <button type="button" id="mnavEdit" class="mseg active" role="tab" aria-selected="true" onclick="setMobileView('edit')"><i class="ti ti-edit"></i> <span>Edit</span></button>
+    <button type="button" id="mnavPreview" class="mseg" role="tab" aria-selected="false" onclick="setMobileView('preview')"><i class="ti ti-eye"></i> <span>Preview</span></button>
+  </div>
+  <button type="button" class="mobile-ats" id="mobileAtsBtn" onclick="openATS()" aria-label="Check ATS score" hidden><i class="ti ti-radar-2"></i> <span>ATS</span></button>
+  <button type="button" class="mobile-dl" id="mobileDownloadBtn" onclick="mobileDownload()" aria-label="Save and download PDF"><i class="ti ti-download"></i> <span>PDF</span></button>
+</nav>
+
+<footer class="app-footer">
+  <p>&copy; 2026 Resume Astra. All Rights Reserved. Designed and Developed by Saswat Palo.</p>
+</footer>
+
+<!-- ATS Checker modal -->
+<div class="ats-overlay" id="atsOverlay" style="display:none;" onclick="closeATSOnOverlay(event)">
+  <div class="ats-modal glass-card" onclick="event.stopPropagation()">
+    <div class="ats-modal-header">
+      <h3><i class="ti ti-radar-2"></i> ATS Score Checker</h3>
+      <button class="ats-close-btn" onclick="closeATS()" aria-label="Close"><i class="ti ti-x"></i></button>
+    </div>
+
+    <button class="ats-trigger" id="atsRunBtn" onclick="runATSCheck()">
+      <i class="ti ti-radar-2"></i> <span id="atsRunBtnText">Re-run check</span>
+    </button>
+
+    <p class="ai-error-note" id="atsError" style="display:none; margin-top:12px;"><i class="ti ti-alert-triangle"></i> <span></span></p>
+
+    <div id="atsLoading" class="ats-loading" style="display:none;">
+      <i class="ti ti-loader-2 spin-icon"></i>
+      <span>Reading your resume and scoring it...</span>
+    </div>
+
+    <div id="atsEmpty" class="ats-empty-state" style="display:none;">
+      We couldn't score your resume just now. Press the button above to try again.
+    </div>
+
+    <div id="atsResult" style="display:none; margin-top:18px;">
+      <div class="ats-score-wrap">
+        <div class="ats-score-ring">
+          <svg width="84" height="84" viewBox="0 0 84 84">
+            <circle class="ats-score-ring-bg" cx="42" cy="42" r="34"></circle>
+            <circle class="ats-score-ring-fill" id="atsRingFill" cx="42" cy="42" r="34" stroke="#4361ee" stroke-dasharray="214 214" stroke-dashoffset="214"></circle>
+          </svg>
+          <div class="ats-score-num" id="atsScoreNum">0</div>
+        </div>
+        <div>
+          <div class="ats-verdict" id="atsVerdict"></div>
+          <div class="ats-verdict-sub" id="atsVerdictSub"></div>
+          <div class="ats-delta" id="atsDelta" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="ats-section" id="atsMoreSection" style="display:none;">
+        <div class="ats-more">
+          <div class="ats-more-head"><i class="ti ti-message-question"></i> A few details would raise your score</div>
+          <p class="ats-more-sub">Answer whichever you can. AI will add them to your resume - using only what you write — and re-check the score.</p>
+          <div id="atsQuestions"></div>
+          <button type="button" class="generate-cta ats-refine-cta" id="atsRefineBtn" onclick="submitATSAnswers()">
+            <i class="ti ti-wand"></i> <span>Update my resume with these details</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ats-section" id="atsStrengthsSection">
+        <div class="ats-section-title strengths"><i class="ti ti-check"></i> Strengths</div>
+        <ul class="ats-list strengths" id="atsStrengthsList"></ul>
+      </div>
+
+      <div class="ats-section" id="atsImprovementsSection">
+        <div class="ats-section-title improvements"><i class="ti ti-bulb"></i> Suggested improvements</div>
+        <ul class="ats-list improvements" id="atsImprovementsList"></ul>
+      </div>
+
+      <div class="ats-section" id="atsKeywordsSection" style="display:none;">
+        <div class="ats-section-title keywords"><i class="ti ti-tags"></i> Keywords worth adding</div>
+        <div class="ats-keyword-chips" id="atsKeywordChips"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Small confirm dialog (used before AI replaces an existing draft) -->
+<div class="ats-overlay confirm-overlay" id="confirmOverlay" style="display:none;">
+  <div class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="confirm-icon"><i class="ti ti-refresh-alert"></i></div>
+    <h3 id="confirmTitle">Replace your current draft?</h3>
+    <p id="confirmMessage"></p>
+    <div class="confirm-actions">
+      <button type="button" class="ghost-btn" id="confirmCancel">Cancel</button>
+      <button type="button" class="btn-primary" id="confirmOk">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
